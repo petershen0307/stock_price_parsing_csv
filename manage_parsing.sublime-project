@@ -4,7 +4,8 @@
         {
             "path": "./",
             "name": "stock code",
-            "file_exclude_patterns": ["*.sublime*"]
+            "file_exclude_patterns" : ["*.sublime*"],
+            "folder_exclude_patterns" : ["__pycache__"]
         }
     ]
 }
