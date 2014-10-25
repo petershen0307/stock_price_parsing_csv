@@ -10,6 +10,7 @@ def parseDividend(stockNumber) :
         htmlDoc = urllib.request.urlopen(parseURL)
     except :
         print('Url error')
+        print(parseURL)
         return None
     parser = BeautifulSoup(htmlDoc.read())
     # hard coed find dividend table
