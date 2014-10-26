@@ -1,7 +1,5 @@
 import re
 import urllib.request
-from numbers import Number
-from pathlib import Path
 
 # combine with stock number and to witch year
 twsePriceUrl = 'http://www.twse.com.tw/ch/trading/exchange/FMNPTK/FMNPTK2.php?STK_NO={stockNumber}&myear={untilYear}&mmon=07&type=csv'
@@ -17,7 +15,7 @@ def getStockPriceFromWeb(stockId, years):
     rawdata = webMessage.read()
     return rawdata.decode('big5')
 
-resultDir = Path('./result_CSV')
+from global_define import RESULT_PATH
 def getStockYearAndPrice(stockId, years, duringYears = 5):
     parsingYears = '年度'
     parsingAvgPrice = '收盤平均價'
@@ -56,16 +54,16 @@ def getStockYearAndPrice(stockId, years, duringYears = 5):
         #[first : second]  list
         # last duringYears
         totalAvgPrice = float(sum(avgPrices[(totalYears - duringYears) : totalYears]) / duringYears)
-    resultList.append(['', totalAvgPrice])
+    resultList.append([str(duringYears) + ' years', totalAvgPrice])
 
-    if not resultDir.exists() :
-        resultDir.mkdir()
-    with open(str(resultDir) + '/avgPrice_{Id}.csv'.format(Id = stockId), 'w', encoding = 'big5') as writeData :
+    if not RESULT_PATH.exists() :
+        RESULT_PATH.mkdir()
+    with open(str(RESULT_PATH) + '/avgPrice_{Id}.csv'.format(Id = stockId), 'w', encoding = 'big5') as writeData :
         for eleList in resultList :
             for eleStr in eleList :
-                #detect the type which is Number
-                if isinstance(eleStr, Number) :
-                    writeData.write(str(eleStr) + ',')
-                else :
-                    writeData.write(eleStr + ',')
+                #detect the type which is Number -> isinstance(eleStr, Number)
+                writeData.write(str(eleStr) + ',')
             writeData.write('\n')
+
+if __name__ == '__main__' :
+    getStockYearAndPrice('1732', 2014, 0)

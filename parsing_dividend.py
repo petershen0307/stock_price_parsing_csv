@@ -1,11 +1,10 @@
 import urllib.request
 from bs4 import BeautifulSoup
-from pathlib import Path
+from global_define import RESULT_PATH
 
 yahooDividendUrl = 'https://tw.stock.yahoo.com/d/s/dividend_{number}.html'
-resultDir = Path('./result_CSV')
-def parseDividend(stockNumber) :
-    parseURL = yahooDividendUrl.format(number = stockNumber)
+def parseDividend(stockId) :
+    parseURL = yahooDividendUrl.format(number = stockId)
     try :
         htmlDoc = urllib.request.urlopen(parseURL)
     except :
@@ -16,16 +15,22 @@ def parseDividend(stockNumber) :
     # hard coed find dividend table
     dividendTable = parser.find('table', width='100%', border='0', cellspacing='1', cellpadding='3')
     
-    if not resultDir.exists() :
-        resultDir.mkdir()
+    if not RESULT_PATH.exists() :
+        RESULT_PATH.mkdir()
     try :
-        out = open(str(resultDir) + '/dividend_{number}.csv'.format(number = stockNumber), 'w')
+        out = open(str(RESULT_PATH) + '/dividend_{number}.csv'.format(number = stockId), 'w')
         for row in dividendTable.find_all('tr') :
+            excludeIndex = 0
             for column in row.find_all('td') :
                 # remove redundent white space
-                out.write(column.string.replace(' ', '').replace('　', '') + ',')
+                if not excludeIndex in range(1, 5) :
+                    out.write(column.string.replace(' ', '').replace('　', '') + ',')
+                excludeIndex += 1
             out.write('\n')
     except Exception as e :
-        print('File error\n' + e)
+        print('Open file error\n' + e)
     finally :
         out.close()
+
+if __name__ == '__main__' :
+    parseDividend('1732')
